@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Controlled Robot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-image: url('https://static.vecteezy.com/system/resources/previews/005/205/363/non_2x/cute-blue-robot-on-blue-background-graphic-illustration-cyborg-futuristic-design-robotic-toy-robot-robot-technology-machine-future-science-toy-cute-element-icon-character-cartoon-robot-free-vector.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: white;
+            padding: 20px;
+        }
+        .top-left-image {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 200px;
+            height: auto;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .connect-btn { background-color: #28a745; color: white; }
+        .send-btn { background-color: #007bff; color: white; }
+        .status { font-size: 18px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Amrita-vishwa-vidyapeetham-logo.svg/2560px-Amrita-vishwa-vidyapeetham-logo.svg.png" alt="Robot Logo" class="top-left-image">
+
+    <h1>Voice-Controlled Robot</h1>
+
+    <button class="btn connect-btn" id="connect-btn">Connect to Bluetooth</button>
+    <button class="btn send-btn" id="send-command-btn">Send Voice Command</button>
+
+    <p class="status" id="command-output">🎤 Command Output: None</p>
+
+    <script>
+        // Function to update UI status
+        function updateStatus(elementId, message, color) {
+            let element = document.getElementById(elementId);
+            element.innerText = message;
+            element.style.color = color;
+        }
+
+        // Connect to Bluetooth
+        document.getElementById("connect-btn").addEventListener("click", function() {
+            console.log("📤 Requesting Bluetooth connection...");
+            
+            fetch("backend/connect_bluetooth.php", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("✅ Bluetooth Response:", data);
+                })
+                .catch(error => {
+                    console.error("❌ Bluetooth Connection Error:", error);
+                });
+        });
+
+        // Send Voice Command
+        document.getElementById("send-command-btn").addEventListener("click", function() {
+            console.log("📤 Sending Voice Command...");
+            updateStatus("command-output", "⏳ Sending command...", "yellow");
+
+            fetch("backend/send_command.php", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("✅ Command Response:", data);
+
+                    if (data.status === "success") {
+                        updateStatus("command-output", data.message, "lightblue");
+                    } else {
+                        updateStatus("command-output", data.message, "red");
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ Command Error:", error);
+                    updateStatus("command-output", "❌ Command Failed!", "red");
+                });
+        });
+    </script>
+</body>
+</html>
